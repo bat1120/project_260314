@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>객체 탐지 (Object Detection)</title>
+    <!-- TailwindCSS for simple and beautiful styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
+    <div class="max-w-4xl mx-auto p-6 mt-10">
+        <div class="bg-white rounded-xl shadow-lg p-8">
+            <h1 class="text-3xl font-bold mb-2 text-center text-blue-600">Object Detection (Faster R-CNN)</h1>
+            <p class="text-center text-gray-500 mb-8">이미지를 업로드하면 객체를 탐지하여 결과를 시각화합니다.</p>
+            
+            <form id="uploadForm" class="flex flex-col items-center gap-4">
+                <div class="w-full max-w-md">
+                    <label class="block mb-2 text-sm font-medium text-gray-900" for="file_input">이미지 업로드</label>
+                    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2" id="file_input" type="file" accept="image/*" required>
+                </div>
+                
+                <div class="w-full max-w-md">
+                    <label class="block mb-2 text-sm font-medium text-gray-900" for="threshold">신뢰도 임계값 (Threshold)</label>
+                    <input type="range" id="threshold" min="0.1" max="1.0" step="0.1" value="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="text-center mt-1 text-sm text-gray-600" id="thresholdValue">0.5</div>
+                </div>
+
+                <button type="submit" class="mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200 shadow-md">
+                    탐지 시작
+                </button>
+            </form>
+
+            <div id="loading" class="hidden flex-col items-center mt-8">
+                <div class="loader mb-4"></div>
+                <p class="text-gray-500">모델 추론 중입니다. 잠시만 기다려주세요...</p>
+            </div>
+
+            <div id="resultSection" class="hidden mt-10 border-t pt-8">
+                <h2 class="text-2xl font-bold mb-4">탐지 결과: <span id="numObjects" class="text-blue-600"></span>개의 객체</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Image -->
+                    <div class="flex justify-center bg-gray-50 rounded-lg border p-2">
+                        <img id="resultImage" class="max-w-full h-auto rounded shadow-sm" src="" alt="Result Image">
+                    </div>
+                    
+                    <!-- JSON Data -->
+                    <div class="bg-gray-800 text-green-400 p-4 rounded-lg overflow-y-auto max-h-[500px] shadow-inner text-sm font-mono format-json">
+                        <pre id="jsonResult"></pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('uploadForm');
+        const fileInput = document.getElementById('file_input');
+        const thresholdInput = document.getElementById('threshold');
+        const thresholdValue = document.getElementById('thresholdValue');
+        
+        const loading = document.getElementById('loading');
+        const resultSection = document.getElementById('resultSection');
+        const resultImage = document.getElementById('resultImage');
+        const jsonResult = document.getElementById('jsonResult');
+        const numObjectsSpan = document.getElementById('numObjects');
+
+        thresholdInput.addEventListener('input', (e) => {
+            thresholdValue.textContent = parseFloat(e.target.value).toFixed(1);
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!fileInput.files[0]) return;
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            formData.append('threshold', thresholdInput.value);
+
+            // UI 업데이트
+            resultSection.classList.add('hidden');
+            loading.classList.remove('hidden');
+            loading.classList.add('flex');
+
+            try {
+                const response = await fetch('/object-detection', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API 오류: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                // 결과 UI 업데이트
+                numObjectsSpan.textContent = data.num_objects;
+                resultImage.src = `data:image/jpeg;base64,${data.image_base64}`;
+                
+                // json 포맷팅을 위해 이미지 데이터는 제외하고 노출
+                const displayData = { ...data };
+                delete displayData.image_base64;
+                jsonResult.textContent = JSON.stringify(displayData, null, 2);
+
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+                resultSection.classList.remove('hidden');
+                
+            } catch (error) {
+                alert(`에러가 발생했습니다: ${error.message}`);
+                loading.classList.add('hidden');
+                loading.classList.remove('flex');
+            }
+        });
+    </script>
+</body>
+</html>

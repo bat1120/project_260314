@@ -1,0 +1,74 @@
+[
+  {
+    "file": "dog.jpg",
+    "path": "test_images\\dog.jpg",
+    "top_prediction": {
+      "class": "Samoyed",
+      "confidence": 75.79065561294556
+    },
+    "top_k": [
+      {
+        "rank": 1,
+        "class": "Samoyed",
+        "confidence": 75.79
+      },
+      {
+        "rank": 2,
+        "class": "Arctic fox",
+        "confidence": 6.54
+      },
+      {
+        "rank": 3,
+        "class": "Pomeranian",
+        "confidence": 6.52
+      },
+      {
+        "rank": 4,
+        "class": "wallaby",
+        "confidence": 1.97
+      },
+      {
+        "rank": 5,
+        "class": "Great Pyrenees",
+        "confidence": 1.62
+      }
+    ],
+    "inference_time_ms": 13.06
+  },
+  {
+    "file": "street.png",
+    "path": "test_images\\street.png",
+    "top_prediction": {
+      "class": "Leonberg",
+      "confidence": 8.956729620695114
+    },
+    "top_k": [
+      {
+        "rank": 1,
+        "class": "Leonberg",
+        "confidence": 8.96
+      },
+      {
+        "rank": 2,
+        "class": "briard",
+        "confidence": 8.85
+      },
+      {
+        "rank": 3,
+        "class": "Bouvier des Flandres",
+        "confidence": 6.12
+      },
+      {
+        "rank": 4,
+        "class": "otterhound",
+        "confidence": 5.48
+      },
+      {
+        "rank": 5,
+        "class": "Chesapeake Bay retriever",
+        "confidence": 4.98
+      }
+    ],
+    "inference_time_ms": 0.0
+  }
+]

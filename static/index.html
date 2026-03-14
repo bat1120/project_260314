@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Interactive Coach</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="glass-bg"></div>
+    <div class="app-container">
+        <!-- Header -->
+        <header>
+            <div class="logo">🏃‍♂️ AI Coach</div>
+            <nav class="tabs">
+                <button class="tab-btn active" data-tab="pose">가상 PT (자세분석)</button>
+                <button class="tab-btn" data-tab="face">회원 인증</button>
+                <button class="tab-btn" data-tab="ocr">성분표 번역</button>
+            </nav>
+        </header>
+
+        <!-- Main Content -->
+        <main>
+            <!-- 1. Pose Tab -->
+            <section id="pose" class="tab-content active glass-panel">
+                <h2>🧘 실시간 가상 PT 분석</h2>
+                <p class="subtitle">웹캠을 켜거나 사진을 업로드해 관절 위치를 정확히 분석합니다.</p>
+                <div class="split-view">
+                    <div class="input-area">
+                        <div class="camera-wrapper">
+                            <video id="pose-video" autoplay playsinline></video>
+                            <canvas id="pose-canvas" style="display:none;"></canvas>
+                        </div>
+                        <div class="controls">
+                            <button id="pose-start-cam" class="btn secondary">웹캠 켜기</button>
+                            <button id="pose-capture" class="btn primary" disabled>자세 캡처 및 분석</button>
+                            <span class="or">- 또는 -</span>
+                            <label class="btn secondary upload-btn">
+                                사진 업로드
+                                <input type="file" id="pose-upload" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="output-area">
+                        <div class="result-box" id="pose-result-box">
+                            <span class="placeholder">여기에 결과가 표시됩니다.</span>
+                            <!-- <img id="pose-result-img" src="" alt="Pose Output"> -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. Face Tab -->
+            <section id="face" class="tab-content glass-panel">
+                <h2>👤 회원 본인 인증</h2>
+                <p class="subtitle">등록된 프로필 사진과 현재 사진을 비교하여 동일인 여부를 판단합니다.</p>
+                
+                <div class="face-inputs">
+                    <!-- 기준(Reference) 사진 -->
+                    <div class="face-card">
+                        <h3>1. 기준 (프로필) 사진</h3>
+                        <div class="img-preview" id="face-ref-preview"></div>
+                        <label class="btn secondary upload-btn">
+                            업로드
+                            <input type="file" id="face-ref-upload" accept="image/*">
+                        </label>
+                    </div>
+
+                    <!-- 실시간(Webcam) 사진 -->
+                    <div class="face-card">
+                        <h3>2. 현재 (웹캠) 사진</h3>
+                        <div class="camera-wrapper mini">
+                            <video id="face-video" autoplay playsinline></video>
+                            <canvas id="face-canvas" style="display:none;"></canvas>
+                        </div>
+                        <div class="controls-row">
+                            <button id="face-start-cam" class="btn secondary">웹캠 켜기</button>
+                            <button id="face-capture" class="btn primary" disabled>캡처</button>
+                        </div>
+                        <div class="img-preview" id="face-cam-preview"></div>
+                    </div>
+                </div>
+
+                <div class="action-footer">
+                    <button id="face-verify-btn" class="btn primary large w-full" disabled>인증하기</button>
+                    <div id="face-result" class="result-msg hidden"></div>
+                </div>
+            </section>
+
+            <!-- 3. OCR Tab -->
+            <section id="ocr" class="tab-content glass-panel">
+                <h2>💊 성분표 번역 및 분석</h2>
+                <p class="subtitle">해외 보충제나 영양제의 성분표를 촬영하여 한글로 번역합니다.</p>
+                
+                <div class="split-view">
+                    <div class="input-area">
+                        <div class="camera-wrapper">
+                            <video id="ocr-video" autoplay playsinline></video>
+                            <canvas id="ocr-canvas" style="display:none;"></canvas>
+                        </div>
+                        <div class="controls">
+                            <button id="ocr-start-cam" class="btn secondary">웹캠 켜기</button>
+                            <button id="ocr-capture" class="btn primary" disabled>캡처 및 번역</button>
+                            <span class="or">- 또는 -</span>
+                            <label class="btn secondary upload-btn">
+                                사진 업로드
+                                <input type="file" id="ocr-upload" accept="image/*">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="output-area">
+                        <div class="result-box" id="ocr-result-box">
+                            <span class="placeholder">여기에 번역된 결과가 표시됩니다.</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+        
+        <!-- Loading Overlay -->
+        <div id="loading" class="loading-overlay hidden">
+            <div class="spinner"></div>
+            <p>AI가 분석 중입니다...</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

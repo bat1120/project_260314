@@ -1,0 +1,100 @@
+[
+  {
+    "file": "dog.jpg",
+    "path": "test_images\\dog.jpg",
+    "image_size": {
+      "width": 1546,
+      "height": 1213
+    },
+    "num_objects": 1,
+    "inference_time_ms": 182.42,
+    "threshold": 0.5,
+    "model": "fasterrcnn_resnet50",
+    "detections": [
+      {
+        "class": "dog",
+        "confidence": 99.66,
+        "bbox": {
+          "x1": 155.6,
+          "y1": 49.6,
+          "x2": 1495.0,
+          "y2": 1145.5
+        }
+      }
+    ]
+  },
+  {
+    "file": "street.png",
+    "path": "test_images\\street.png",
+    "image_size": {
+      "width": 1282,
+      "height": 1026
+    },
+    "num_objects": 6,
+    "inference_time_ms": 188.65,
+    "threshold": 0.5,
+    "model": "fasterrcnn_resnet50",
+    "detections": [
+      {
+        "class": "person",
+        "confidence": 99.97,
+        "bbox": {
+          "x1": 449.9,
+          "y1": 308.7,
+          "x2": 775.8,
+          "y2": 916.8
+        }
+      },
+      {
+        "class": "sheep",
+        "confidence": 99.9,
+        "bbox": {
+          "x1": 216.3,
+          "y1": 593.9,
+          "x2": 429.4,
+          "y2": 890.5
+        }
+      },
+      {
+        "class": "sheep",
+        "confidence": 99.89,
+        "bbox": {
+          "x1": 851.2,
+          "y1": 582.7,
+          "x2": 1097.8,
+          "y2": 880.6
+        }
+      },
+      {
+        "class": "sheep",
+        "confidence": 99.75,
+        "bbox": {
+          "x1": 375.4,
+          "y1": 630.4,
+          "x2": 526.0,
+          "y2": 882.4
+        }
+      },
+      {
+        "class": "sheep",
+        "confidence": 98.67,
+        "bbox": {
+          "x1": 572.0,
+          "y1": 566.3,
+          "x2": 834.1,
+          "y2": 879.3
+        }
+      },
+      {
+        "class": "dog",
+        "confidence": 92.85,
+        "bbox": {
+          "x1": 784.0,
+          "y1": 761.7,
+          "x2": 864.5,
+          "y2": 824.7
+        }
+      }
+    ]
+  }
+]
