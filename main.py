@@ -3,7 +3,8 @@ import re
 import uuid
 import sys
 import traceback
-from fastapi import FastAPI, File, UploadFile
+import base64
+from fastapi import FastAPI, File, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
+from posture_logic import PostureAnalyzer
+from pydantic import BaseModel
 
 # Encode fix for Windows
 if sys.stdout.encoding != 'utf-8':
@@ -61,6 +64,19 @@ try:
     from test_face_recognition import compare_faces
 except Exception as e:
     print(f"Failed to load Face Recognition module: {e}")
+
+sentiment_analyzer = None
+try:
+    from transformers import pipeline
+    print("Loading Sentiment Analysis Model...")
+    sentiment_analyzer = pipeline(
+        "sentiment-analysis",
+        model="nlptown/bert-base-multilingual-uncased-sentiment",
+        device=0 if torch.cuda.is_available() else -1
+    )
+    print("Sentiment Analysis Model loaded successfully.")
+except Exception as e:
+    print(f"Failed to load Sentiment Analysis Model: {e}")
 
 import math
 
@@ -190,6 +206,61 @@ def save_upload_file(upload_file: UploadFile) -> str:
 # API Endpoints
 # ==========================================
 
+# ==========================================
+# Posture Monitor WebSockets
+# ==========================================
+@app.websocket("/ws/posture")
+async def websocket_posture(websocket: WebSocket):
+    await websocket.accept()
+    analyzer = PostureAnalyzer()
+    
+    try:
+        while True:
+            data = await websocket.receive_json()
+            
+            # Handle Calibration
+            if data.get("action") == "calibrate":
+                calibration_data = data.get("data")
+                if calibration_data:
+                    analyzer.calibrate(
+                        calibration_data["shoulder_width_ratio"],
+                        calibration_data["ear_shoulder_z_diff"],
+                        calibration_data["nose_shoulder_y_diff"]
+                    )
+                    await websocket.send_json({"type": "info", "message": "Calibration successful"})
+                continue
+                
+            # Handle Frame Analysis
+            image_b64 = data.get("image")
+            if not image_b64:
+                continue
+                
+            # Decode base64 to OpenCV BGR then RGB
+            try:
+                # Remove header if present (e.g. data:image/jpeg;base64,)
+                img_data = base64.b64decode(image_b64.split(",")[1] if "," in image_b64 else image_b64)
+                np_arr = np.frombuffer(img_data, np.uint8)
+                img_bgr = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+                img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+                
+                # Analyze posture
+                status, color, warning, is_bad, landmarks, calib_data = analyzer.analyze_frame(img_rgb)
+                
+                await websocket.send_json({
+                    "type": "result",
+                    "status_text": status,
+                    "color": color,
+                    "warning_msg": warning,
+                    "is_bad_posture": is_bad,
+                    "landmarks": landmarks,
+                    "calib_data": calib_data
+                })
+            except Exception as e:
+                print(f"WebSocket Frame error: {e}")
+                
+    except WebSocketDisconnect:
+        print("Posture WebSocket disconnected")
+
 @app.post("/api/pose")
 async def process_pose(file: UploadFile = File(...)):
     if pose_model is None:
@@ -283,6 +354,70 @@ async def process_ocr(file: UploadFile = File(...)):
              
     except Exception as e:
         print(f"[OCR] Error: {traceback.format_exc()}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+# ==========================================
+# Sentiment Analysis
+# ==========================================
+class SentimentRequest(BaseModel):
+    text: str
+
+def _map_sentiment(label: str, score: float):
+    """Map star-based labels to human-friendly Korean sentiment."""
+    star = int(label.split()[0])  # e.g. '5 stars' -> 5
+    if star >= 4:
+        sentiment = "긍정"
+    elif star == 3:
+        sentiment = "중립"
+    else:
+        sentiment = "부정"
+    return {"sentiment": sentiment, "stars": star, "confidence": round(score, 4)}
+
+@app.post("/api/sentiment")
+async def analyze_sentiment(req: SentimentRequest):
+    """텍스트 감정 분석 API — 1~5 star 기반 다국어 모델 사용"""
+    if sentiment_analyzer is None:
+        return JSONResponse(status_code=500, content={"error": "Sentiment model not loaded"})
+
+    text = req.text.strip()
+    if not text:
+        return JSONResponse(status_code=400, content={"error": "텍스트를 입력해주세요."})
+
+    try:
+        # 모델 최대 입력 길이 제한 (512 tokens)
+        results = sentiment_analyzer(text[:512])
+        result = results[0]  # {label: '5 stars', score: 0.98}
+        mapped = _map_sentiment(result["label"], result["score"])
+        return {
+            "status": "success",
+            "text": text,
+            "result": mapped
+        }
+    except Exception as e:
+        print(f"[Sentiment] Error: {traceback.format_exc()}")
+        return JSONResponse(status_code=500, content={"error": str(e)})
+
+@app.post("/api/sentiment/batch")
+async def analyze_sentiment_batch(texts: list[str]):
+    """여러 텍스트를 한번에 감정 분석"""
+    if sentiment_analyzer is None:
+        return JSONResponse(status_code=500, content={"error": "Sentiment model not loaded"})
+
+    if not texts or len(texts) == 0:
+        return JSONResponse(status_code=400, content={"error": "텍스트 리스트가 비어있습니다."})
+
+    try:
+        truncated = [t.strip()[:512] for t in texts if t.strip()]
+        results = sentiment_analyzer(truncated)
+        mapped = [_map_sentiment(r["label"], r["score"]) for r in results]
+        return {
+            "status": "success",
+            "results": [
+                {"text": t, **m} for t, m in zip(truncated, mapped)
+            ]
+        }
+    except Exception as e:
+        print(f"[Sentiment Batch] Error: {traceback.format_exc()}")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @app.get("/")

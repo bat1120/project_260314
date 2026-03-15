@@ -74,6 +74,149 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ----------------------------------------------------------------
+    // 1.5. Posture WebSockets Tab Logic
+    // ----------------------------------------------------------------
+    const wsVideo = document.getElementById('ws-video');
+    const wsCanvas = document.getElementById('ws-canvas');
+    const wsStartBtn = document.getElementById('ws-start-cam');
+    const wsStopBtn = document.getElementById('ws-stop-cam');
+    const wsCalibrateBtn = document.getElementById('ws-calibrate');
+    const wsStatusText = document.getElementById('ws-status-text');
+    const wsWarningMsg = document.getElementById('ws-warning-msg');
+    const wsStatusCircle = document.getElementById('ws-status-circle');
+
+    let postureWs = null;
+    let wsInterval = null;
+    let wsWarningStartTime = null;
+    let audioContext = null;
+
+    function playBeep() {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        const oscillator = audioContext.createOscillator();
+        const gainNode = audioContext.createGain();
+        oscillator.connect(gainNode);
+        gainNode.connect(audioContext.destination);
+        oscillator.type = 'sine';
+        oscillator.frequency.value = 1000; // 1000Hz
+        gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + 0.5); // Play for 0.5s
+    }
+
+    wsStartBtn.addEventListener('click', async () => {
+        try {
+            await startCamera(wsVideo, wsStopBtn);
+            wsStartBtn.disabled = true;
+            wsCalibrateBtn.disabled = false;
+            wsStatusText.textContent = "연결 중...";
+            
+            // Connect to WebSocket
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            postureWs = new WebSocket(`${protocol}//${window.location.host}/ws/posture`);
+            
+            postureWs.onopen = () => {
+                wsStatusText.textContent = "자세 모니터링 시작 (Not Calibrated)";
+                // Send frames every 200ms (5 FPS)
+                wsInterval = setInterval(() => {
+                    const ctx = wsCanvas.getContext('2d');
+                    wsCanvas.width = 640;
+                    wsCanvas.height = 480;
+                    ctx.drawImage(wsVideo, 0, 0, 640, 480);
+                    // Send to WS
+                    const base64Data = wsCanvas.toDataURL('image/jpeg', 0.5);
+                    if(postureWs.readyState === WebSocket.OPEN) {
+                        postureWs.send(JSON.stringify({ image: base64Data }));
+                    }
+                }, 200);
+            };
+
+            postureWs.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                
+                if (data.type === 'result') {
+                    wsStatusText.textContent = data.status_text;
+                    wsStatusText.style.color = data.color;
+                    wsStatusCircle.style.backgroundColor = data.color;
+                    wsWarningMsg.textContent = data.warning_msg || "";
+                    
+                    if (data.is_bad_posture) {
+                        if (!wsWarningStartTime) {
+                            wsWarningStartTime = Date.now();
+                        } else if (Date.now() - wsWarningStartTime > 3000) { // 3 seconds warning delay
+                            playBeep();
+                            wsWarningStartTime = Date.now(); // reset timer after playing sound to play every 3 sec
+                        }
+                    } else {
+                        wsWarningStartTime = null;
+                    }
+
+                    // Save loose calibration data if user clicks Calibrate
+                    if (data.calib_data) {
+                        window.tempCalibData = data.calib_data;
+                    }
+                } else if (data.type === 'info') {
+                    console.log(data.message);
+                }
+            };
+
+            postureWs.onclose = () => {
+                stopWsMonitor();
+            };
+
+        } catch (err) {
+            alert("카메라 시작 실패");
+        }
+    });
+
+    wsStopBtn.addEventListener('click', stopWsMonitor);
+
+    function stopWsMonitor() {
+        if(wsInterval) clearInterval(wsInterval);
+        if(postureWs) {
+            postureWs.close();
+            postureWs = null;
+        }
+        stopAllStreams();
+        wsStartBtn.disabled = false;
+        wsStopBtn.disabled = true;
+        wsCalibrateBtn.disabled = true;
+        wsStatusText.textContent = "대기 중";
+        wsStatusText.style.color = "#f8fafc";
+        wsStatusCircle.style.backgroundColor = "#94a3b8";
+        wsWarningMsg.textContent = "";
+        wsWarningStartTime = null;
+    }
+
+    wsCalibrateBtn.addEventListener('click', () => {
+        if(postureWs && postureWs.readyState === WebSocket.OPEN && window.tempCalibData) {
+            postureWs.send(JSON.stringify({
+                action: 'calibrate',
+                data: window.tempCalibData
+            }));
+            alert("현재 자세가 올바른 자세 기준으로 등록되었습니다.");
+            
+            // Audio context must be resumed/created after a user gesture
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        } else {
+            alert("아직 자세 정보가 로드되지 않았습니다. 잠시 후 캘리브레이션 버튼을 눌러주세요.");
+        }
+    });
+
+    // Handle Tab switching (graceful closing of ws)
+    const existingTabClickLogic = [];
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            if(btn.getAttribute('data-tab') !== 'posture_ws') {
+                stopWsMonitor();
+            }
+        });
+    });
+
+    // ----------------------------------------------------------------
     // 2. POSE Tab Logic
     // ----------------------------------------------------------------
     const poseVideo = document.getElementById('pose-video');
@@ -274,4 +417,123 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
         box.innerHTML = html;
     }
+
+    // ----------------------------------------------------------------
+    // 5. SENTIMENT Tab Logic
+    // ----------------------------------------------------------------
+    const sentimentText = document.getElementById('sentiment-text');
+    const sentimentBtn = document.getElementById('sentiment-analyze-btn');
+    const sentimentResultBox = document.getElementById('sentiment-result-box');
+    const sentimentBatchText = document.getElementById('sentiment-batch-text');
+    const sentimentBatchBtn = document.getElementById('sentiment-batch-btn');
+    const sentimentBatchResult = document.getElementById('sentiment-batch-result');
+
+    function getSentimentEmoji(sentiment, stars) {
+        if (stars >= 5) return '😄';
+        if (stars >= 4) return '🙂';
+        if (stars === 3) return '😐';
+        if (stars === 2) return '😟';
+        return '😢';
+    }
+
+    function getSentimentColor(sentiment) {
+        if (sentiment === '긍정') return '#34d399';
+        if (sentiment === '중립') return '#fbbf24';
+        return '#f87171';
+    }
+
+    function renderStars(count) {
+        return '★'.repeat(count) + '☆'.repeat(5 - count);
+    }
+
+    sentimentBtn.addEventListener('click', async () => {
+        const text = sentimentText.value.trim();
+        if (!text) {
+            alert('텍스트를 입력해주세요.');
+            return;
+        }
+
+        showLoading();
+        try {
+            const res = await fetch('/api/sentiment', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text })
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                const r = data.result;
+                const emoji = getSentimentEmoji(r.sentiment, r.stars);
+                const color = getSentimentColor(r.sentiment);
+
+                sentimentResultBox.innerHTML = `
+                    <div class="sentiment-card">
+                        <div class="sentiment-emoji">${emoji}</div>
+                        <div class="sentiment-label" style="color: ${color};">${r.sentiment}</div>
+                        <div class="sentiment-stars" style="color: ${color};">${renderStars(r.stars)}</div>
+                        <div class="sentiment-conf">신뢰도: ${(r.confidence * 100).toFixed(1)}%</div>
+                    </div>
+                `;
+            } else {
+                sentimentResultBox.innerHTML = `<span class="placeholder">⚠️ ${data.error}</span>`;
+            }
+        } catch (err) {
+            alert('서버 연결 오류');
+        }
+        hideLoading();
+    });
+
+    sentimentBatchBtn.addEventListener('click', async () => {
+        const raw = sentimentBatchText.value.trim();
+        if (!raw) {
+            alert('텍스트를 입력해주세요.');
+            return;
+        }
+
+        const texts = raw.split('\n').map(t => t.trim()).filter(t => t.length > 0);
+        if (texts.length === 0) {
+            alert('분석할 텍스트가 없습니다.');
+            return;
+        }
+
+        showLoading();
+        try {
+            const res = await fetch('/api/sentiment/batch', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(texts)
+            });
+            const data = await res.json();
+
+            if (data.status === 'success') {
+                let html = `<div class="table-container"><table class="ocr-table">
+                    <thead><tr>
+                        <th>텍스트</th>
+                        <th>감정</th>
+                        <th>별점</th>
+                        <th>신뢰도</th>
+                    </tr></thead><tbody>`;
+
+                data.results.forEach(item => {
+                    const color = getSentimentColor(item.sentiment);
+                    const emoji = getSentimentEmoji(item.sentiment, item.stars);
+                    html += `<tr>
+                        <td>${item.text}</td>
+                        <td style="color:${color}; font-weight:700;">${emoji} ${item.sentiment}</td>
+                        <td style="color:${color};">${renderStars(item.stars)}</td>
+                        <td>${(item.confidence * 100).toFixed(1)}%</td>
+                    </tr>`;
+                });
+
+                html += '</tbody></table></div>';
+                sentimentBatchResult.innerHTML = html;
+            } else {
+                sentimentBatchResult.innerHTML = `<span class="placeholder">⚠️ ${data.error}</span>`;
+            }
+        } catch (err) {
+            alert('서버 연결 오류');
+        }
+        hideLoading();
+    });
 });

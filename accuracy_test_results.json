@@ -1,0 +1,285 @@
+{
+  "model": "openai/clip-vit-base-patch32",
+  "device": "cpu",
+  "overall_accuracy": 97.22,
+  "overall_correct": 35,
+  "overall_total": 36,
+  "categories": {
+    "animal": {
+      "preset": "animal",
+      "accuracy": 100.0,
+      "correct": 9,
+      "total": 9,
+      "details": [
+        {
+          "file": "dog_01.jpg",
+          "expected": "개 (dog)",
+          "predicted": "개 (dog)",
+          "confidence": 98.42,
+          "correct": true
+        },
+        {
+          "file": "dog_02.jpg",
+          "expected": "개 (dog)",
+          "predicted": "개 (dog)",
+          "confidence": 90.58,
+          "correct": true
+        },
+        {
+          "file": "dog_03.jpg",
+          "expected": "개 (dog)",
+          "predicted": "개 (dog)",
+          "confidence": 98.66,
+          "correct": true
+        },
+        {
+          "file": "dog_04.jpg",
+          "expected": "개 (dog)",
+          "predicted": "개 (dog)",
+          "confidence": 97.86,
+          "correct": true
+        },
+        {
+          "file": "cat_01.jpg",
+          "expected": "고양이 (cat)",
+          "predicted": "고양이 (cat)",
+          "confidence": 96.03,
+          "correct": true
+        },
+        {
+          "file": "cat_02.jpg",
+          "expected": "고양이 (cat)",
+          "predicted": "고양이 (cat)",
+          "confidence": 96.25,
+          "correct": true
+        },
+        {
+          "file": "cat_03.jpg",
+          "expected": "고양이 (cat)",
+          "predicted": "고양이 (cat)",
+          "confidence": 73.09,
+          "correct": true
+        },
+        {
+          "file": "bird_01.jpg",
+          "expected": "새 (bird)",
+          "predicted": "새 (bird)",
+          "confidence": 96.09,
+          "correct": true
+        },
+        {
+          "file": "elephant_01.jpg",
+          "expected": "코끼리 (elephant)",
+          "predicted": "코끼리 (elephant)",
+          "confidence": 99.64,
+          "correct": true
+        }
+      ]
+    },
+    "food": {
+      "preset": "food",
+      "accuracy": 92.31,
+      "correct": 12,
+      "total": 13,
+      "details": [
+        {
+          "file": "pizza_01.jpg",
+          "expected": "피자 (pizza)",
+          "predicted": "피자 (pizza)",
+          "confidence": 99.64,
+          "correct": true
+        },
+        {
+          "file": "pizza_02.jpg",
+          "expected": "피자 (pizza)",
+          "predicted": "피자 (pizza)",
+          "confidence": 99.15,
+          "correct": true
+        },
+        {
+          "file": "pizza_03.jpg",
+          "expected": "피자 (pizza)",
+          "predicted": "피자 (pizza)",
+          "confidence": 99.26,
+          "correct": true
+        },
+        {
+          "file": "sushi_01.jpg",
+          "expected": "스시 (sushi)",
+          "predicted": "스시 (sushi)",
+          "confidence": 99.72,
+          "correct": true
+        },
+        {
+          "file": "sushi_02.jpg",
+          "expected": "스시 (sushi)",
+          "predicted": "스시 (sushi)",
+          "confidence": 99.51,
+          "correct": true
+        },
+        {
+          "file": "burger_01.jpg",
+          "expected": "햄버거 (hamburger)",
+          "predicted": "햄버거 (hamburger)",
+          "confidence": 99.62,
+          "correct": true
+        },
+        {
+          "file": "burger_02.jpg",
+          "expected": "햄버거 (hamburger)",
+          "predicted": "햄버거 (hamburger)",
+          "confidence": 62.75,
+          "correct": true
+        },
+        {
+          "file": "pasta_01.jpg",
+          "expected": "파스타 (pasta)",
+          "predicted": "파스타 (pasta)",
+          "confidence": 99.05,
+          "correct": true
+        },
+        {
+          "file": "pasta_02.jpg",
+          "expected": "파스타 (pasta)",
+          "predicted": "샐러드 (salad)",
+          "confidence": 68.8,
+          "correct": false
+        },
+        {
+          "file": "cake_01.jpg",
+          "expected": "케이크 (cake)",
+          "predicted": "케이크 (cake)",
+          "confidence": 97.32,
+          "correct": true
+        },
+        {
+          "file": "salad_01.jpg",
+          "expected": "샐러드 (salad)",
+          "predicted": "샐러드 (salad)",
+          "confidence": 99.6,
+          "correct": true
+        },
+        {
+          "file": "salad_02.jpg",
+          "expected": "샐러드 (salad)",
+          "predicted": "샐러드 (salad)",
+          "confidence": 99.47,
+          "correct": true
+        },
+        {
+          "file": "steak_01.jpg",
+          "expected": "스테이크 (steak)",
+          "predicted": "스테이크 (steak)",
+          "confidence": 91.91,
+          "correct": true
+        }
+      ]
+    },
+    "plant": {
+      "preset": "plant",
+      "accuracy": 100.0,
+      "correct": 14,
+      "total": 14,
+      "details": [
+        {
+          "file": "rose_01.jpg",
+          "expected": "장미 (rose)",
+          "predicted": "장미 (rose)",
+          "confidence": 99.34,
+          "correct": true
+        },
+        {
+          "file": "rose_02.jpg",
+          "expected": "장미 (rose)",
+          "predicted": "장미 (rose)",
+          "confidence": 99.48,
+          "correct": true
+        },
+        {
+          "file": "rose_03.jpg",
+          "expected": "장미 (rose)",
+          "predicted": "장미 (rose)",
+          "confidence": 99.66,
+          "correct": true
+        },
+        {
+          "file": "sunflower_01.jpg",
+          "expected": "해바라기 (sunflower)",
+          "predicted": "해바라기 (sunflower)",
+          "confidence": 99.97,
+          "correct": true
+        },
+        {
+          "file": "sunflower_02.jpg",
+          "expected": "해바라기 (sunflower)",
+          "predicted": "해바라기 (sunflower)",
+          "confidence": 99.61,
+          "correct": true
+        },
+        {
+          "file": "tulip_01.jpg",
+          "expected": "튤립 (tulip)",
+          "predicted": "튤립 (tulip)",
+          "confidence": 99.94,
+          "correct": true
+        },
+        {
+          "file": "tulip_02.jpg",
+          "expected": "튤립 (tulip)",
+          "predicted": "튤립 (tulip)",
+          "confidence": 99.88,
+          "correct": true
+        },
+        {
+          "file": "cactus_01.jpg",
+          "expected": "선인장 (cactus)",
+          "predicted": "선인장 (cactus)",
+          "confidence": 99.78,
+          "correct": true
+        },
+        {
+          "file": "cactus_02.jpg",
+          "expected": "선인장 (cactus)",
+          "predicted": "선인장 (cactus)",
+          "confidence": 99.98,
+          "correct": true
+        },
+        {
+          "file": "cherry_01.jpg",
+          "expected": "벚꽃 (cherry blossom)",
+          "predicted": "벚꽃 (cherry blossom)",
+          "confidence": 99.45,
+          "correct": true
+        },
+        {
+          "file": "cherry_02.jpg",
+          "expected": "벚꽃 (cherry blossom)",
+          "predicted": "벚꽃 (cherry blossom)",
+          "confidence": 95.85,
+          "correct": true
+        },
+        {
+          "file": "dandelion_01.jpg",
+          "expected": "민들레 (dandelion)",
+          "predicted": "민들레 (dandelion)",
+          "confidence": 99.82,
+          "correct": true
+        },
+        {
+          "file": "dandelion_02.jpg",
+          "expected": "민들레 (dandelion)",
+          "predicted": "민들레 (dandelion)",
+          "confidence": 99.47,
+          "correct": true
+        },
+        {
+          "file": "lavender_01.jpg",
+          "expected": "라벤더 (lavender)",
+          "predicted": "라벤더 (lavender)",
+          "confidence": 99.92,
+          "correct": true
+        }
+      ]
+    }
+  }
+}

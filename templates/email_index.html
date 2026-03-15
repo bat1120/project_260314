@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>비즈니스 이메일 AI 순화기 ✉️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* 라이트 모드 변수 */
+            --primary-bg: #f4f6f9;
+            --surface-color: #ffffff;
+            --primary-color: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text-dark: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --danger-color: #ef4444;
+            --danger-bg: #fef2f2;
+            --success-color: #10b981;
+            --success-bg: #ecfdf5;
+            --input-bg: #f8fafc;
+            --input-focus-bg: #ffffff;
+            --preview-bg: #fafafa;
+            --preview-header-bg: #eff6ff;
+            --preview-header-border: #bfdbfe;
+            --preview-subject: #1e3a8a;
+            --preview-body-bg: #ffffff;
+            --logo-bg: #e0e7ff;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+            --overlay-bg: rgba(255, 255, 255, 0.8);
+            --copy-btn-bg: #ffffff;
+            --copy-btn-hover: #f8fafc;
+            --header-title: #0f172a;
+            --label-color: #334155;
+        }
+
+        /* 다크 모드 변수 */
+        [data-theme="dark"] {
+            --primary-bg: #0f172a;
+            --surface-color: #1e293b;
+            --primary-color: #3b82f6;
+            --primary-hover: #60a5fa;
+            --text-dark: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #334155;
+            --danger-color: #fca5a5;
+            --danger-bg: rgba(239, 68, 68, 0.15);
+            --success-color: #6ee7b7;
+            --success-bg: rgba(16, 185, 129, 0.15);
+            --input-bg: #0f172a;
+            --input-focus-bg: #1e293b;
+            --preview-bg: #0f172a;
+            --preview-header-bg: #172554;
+            --preview-header-border: #1e3a8a;
+            --preview-subject: #bfdbfe;
+            --preview-body-bg: #1e293b;
+            --logo-bg: #1e3a8a;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.4), 0 2px 4px -1px rgba(0,0,0,0.2);
+            --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.5), 0 4px 6px -2px rgba(0,0,0,0.3);
+            --overlay-bg: rgba(15, 23, 42, 0.85);
+            --copy-btn-bg: #1e293b;
+            --copy-btn-hover: #334155;
+            --header-title: #f8fafc;
+            --label-color: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--primary-bg);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 3rem 1.5rem;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+        }
+
+        #themeToggleBtn {
+            background: none;
+            border: none;
+            color: var(--text-dark);
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.2s;
+        }
+
+        #themeToggleBtn:hover {
+            background-color: rgba(128, 128, 128, 0.1);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            background: var(--logo-bg);
+            width: 80px;
+            height: 80px;
+            line-height: 80px;
+            border-radius: 20px;
+            color: var(--primary-color);
+            box-shadow: var(--shadow-sm);
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--header-title);
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .app-card {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+        }
+
+        .form-group {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--label-color);
+            font-size: 1.05rem;
+        }
+        
+        .label-desc {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-left: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 150px;
+            padding: 1rem;
+            font-size: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            background-color: var(--input-bg);
+            color: var(--text-dark);
+            resize: vertical;
+            transition: all 0.2s ease;
+            box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.03);
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background-color: var(--input-focus-bg);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        button.submit-btn {
+            width: 100%;
+            background-color: var(--primary-color);
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 1rem;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button.submit-btn:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        
+        button.submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            background-color: var(--danger-bg);
+            color: var(--danger-color);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-top: 1.5rem;
+            border: 1px solid var(--danger-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Result Section */
+        .result-section {
+            margin-top: 2.5rem;
+            padding-top: 2.5rem;
+            border-top: 2px dashed var(--border-color);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .result-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--header-title);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .result-title::before {
+            content: '✨';
+        }
+
+        .email-preview {
+            background-color: var(--preview-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .email-header {
+            background-color: var(--preview-header-bg);
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--preview-header-border);
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .email-subject-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .email-subject {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--preview-subject);
+        }
+
+        .email-body {
+            padding: 1.5rem;
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-dark);
+            white-space: pre-wrap;
+            background-color: var(--preview-body-bg);
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn {
+            background-color: var(--copy-btn-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+        
+        .copy-btn:hover {
+            background-color: var(--copy-btn-hover);
+            color: var(--text-dark);
+            border-color: var(--border-color);
+        }
+
+        /* Loading Spinner Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: var(--overlay-bg);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--border-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        
+        .loading-text {
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <button id="themeToggleBtn" aria-label="다크/라이트 모드 변경" title="테마 변경">
+            <!-- Icon is set by JS -->
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+        </button>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+        <div class="loading-text">상대방을 존중하는 프로페셔널한 언어로 다듬는 중입니다... ✒️</div>
+    </div>
+
+    <div class="container">
+        <header>
+            <div class="logo-icon">💼</div>
+            <h1>비즈니스 이메일 순화기</h1>
+            <p class="subtitle">감정적인 텍스트나 거친 표현을 입력하면, 상위 1% 비즈니스 전문가의 정중하고 명확한 이메일로 자동 변환해 드립니다.</p>
+        </header>
+
+        <div class="app-card">
+            <form action="/api/rewrite" method="POST" onsubmit="showLoading()">
+                <div class="form-group">
+                    <label for="original_text">
+                        초안 작성 
+                        <span class="label-desc">화나는 마음 그대로 솔직하게 적어주세요.</span>
+                    </label>
+                    <textarea 
+                        id="original_text" 
+                        name="original_text" 
+                        placeholder="예) 아니 저번에 부탁한 자료 아직까지 안 주시면 어쩌자는 겁니까? 내일까지 무조건 보내세요. 안 그럼 진짜 팀장한테 말합니다." 
+                        required
+                    >{{ original_text if original_text else '' }}</textarea>
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                    </svg>
+                    정중한 비즈니스 이메일로 변환하기
+                </button>
+            </form>
+
+            <!-- 에러 메시지 섹션 -->
+            {% if error %}
+            <div class="error-message">
+                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span>{{ error }}</span>
+            </div>
+            {% endif %}
+
+            <!-- 결과 색션 -->
+            {% if result %}
+            <div class="result-section" id="resultBlock">
+                <div class="result-title">변환 완료</div>
+                
+                <div class="email-preview">
+                    <div class="email-header">
+                        <div class="email-subject-label">추천 제목</div>
+                        <div class="email-subject" id="generatedSubject">{{ result.제목 }}</div>
+                    </div>
+                    <div class="email-body" id="generatedBody">{{ result.본문 }}</div>
+                </div>
+                
+                <button type="button" class="copy-btn" onclick="copyEmail()">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    이메일 복사하기
+                </button>
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+
+    <script>
+        // --- 테마 설정 로직 ---
+        const themeToggleBtn = document.getElementById('themeToggleBtn');
+        
+        // 로컬 스토리지 또는 시스템 설정으로 초기 테마 확인
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const currentTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+
+        // 초기 테마 적용
+        if (currentTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            updateThemeIcon('dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+            updateThemeIcon('light');
+        }
+
+        // 테마 토글 버튼 클릭 이벤트
+        themeToggleBtn.addEventListener('click', () => {
+            let theme = document.documentElement.getAttribute('data-theme');
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                updateThemeIcon('light');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                updateThemeIcon('dark');
+            }
+        });
+
+        // 아이콘 업데이트 함수
+        function updateThemeIcon(theme) {
+            if (theme === 'dark') {
+                // 해 (라이트 모드로 전환하는 버튼)
+                themeToggleBtn.innerHTML = '<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>';
+            } else {
+                // 달 (다크 모드로 전환하는 버튼)
+                themeToggleBtn.innerHTML = '<svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>';
+            }
+        }
+
+        // --- 기타 UI 로직 ---
+        function showLoading() {
+            document.getElementById('loading-overlay').style.display = 'flex';
+        }
+
+        // 결과 영역으로 부드럽게 스크롤
+        {% if result %}
+        window.onload = function() {
+            document.getElementById('resultBlock').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        {% endif %}
+        
+        // 이메일 클립보드 복사 기능
+        function copyEmail() {
+            const subject = document.getElementById('generatedSubject').innerText;
+            const body = document.getElementById('generatedBody').innerText;
+            const fullText = `제목: ${subject}\n\n${body}`;
+            
+            navigator.clipboard.writeText(fullText).then(() => {
+                const btn = document.querySelector('.copy-btn');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 복사 완료!`;
+                btn.style.color = 'var(--success-color)';
+                btn.style.borderColor = 'var(--success-color)';
+                btn.style.backgroundColor = 'var(--success-bg)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.style = '';
+                }, 2000);
+            }).catch(err => {
+                alert('클립보드 복사에 실패했습니다.');
+                console.error('Error copying text: ', err);
+            });
+        }
+    </script>
+</body>
+</html>

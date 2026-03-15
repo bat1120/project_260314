@@ -3,131 +3,488 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>객체 탐지 (Object Detection)</title>
-    <!-- TailwindCSS for simple and beautiful styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>별자리 연인 궁합 테스트 💖</title>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        .loader {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #3498db;
+        :root {
+            --primary: #ff4b82;
+            --secondary: #ff758c;
+            --accent: #ff7eb3;
+            --bg-color: #1a0f1d;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --text-main: #ffffff;
+            --text-muted: #rgba(255,255,255,0.7);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #15001a 0%, #30103a 50%, #15001a 100%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* 배경 장식용 원 */
+        .decor {
+            position: absolute;
             border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
+            filter: blur(80px);
+            z-index: 0;
+            animation: float 10s infinite ease-in-out alternate;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .decor-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            top: 10%;
+            left: -10%;
+            opacity: 0.3;
         }
+
+        .decor-2 {
+            width: 400px;
+            height: 400px;
+            background: #8e10ff;
+            bottom: -10%;
+            right: -10%;
+            opacity: 0.2;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0) scale(1); }
+            100% { transform: translateY(-50px) scale(1.1); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        p.subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2::before {
+            content: '';
+            display: block;
+            width: 8px;
+            height: 24px;
+            background: var(--primary);
+            border-radius: 4px;
+        }
+
+        .person-card {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s ease;
+        }
+
+        .person-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 75, 130, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 600;
+        }
+
+        input[type="text"], input[type="number"], input[type="date"], select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 75, 130, 0.2);
+        }
+
+        option {
+            background: #2a1b2e;
+            color: white;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            font-size: 1.2rem;
+            font-weight: 800;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(255, 75, 130, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 75, 130, 0.6);
+        }
+
+        .submit-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.5s ease;
+        }
+
+        .submit-btn:hover::after {
+            left: 100%;
+        }
+
+        .result-section {
+            margin-top: 3rem;
+            text-align: center;
+            animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            box-shadow: 0 0 30px rgba(255, 75, 130, 0.5);
+            border: 4px solid rgba(255,255,255,0.1);
+        }
+
+        .score-num {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .score-num span {
+            font-size: 1.5rem;
+        }
+
+        .explanation {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            border-left: 4px solid var(--primary);
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: rgba(255,255,255,0.9);
+        }
+
+        .error-msg {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff453a;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+            text-align: center;
+            border: 1px solid rgba(255, 59, 48, 0.3);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Loading Overlay */
+        #loading {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26, 15, 29, 0.9);
+            backdrop-filter: blur(5px);
+            z-index: 100;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .heart-loader {
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            position: relative;
+            transform: rotate(45deg);
+            animation: pulse 1s infinite alternate;
+        }
+        .heart-loader::before, .heart-loader::after {
+            content: "";
+            width: 50px;
+            height: 50px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            position: absolute;
+        }
+        .heart-loader::before { left: -25px; top: 0; }
+        .heart-loader::after { top: -25px; left: 0; }
+        
+        #loading p {
+            margin-top: 40px;
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 600;
+        }
+
+        @keyframes pulse {
+            0% { transform: rotate(45deg) scale(0.8); opacity: 0.8; }
+            100% { transform: rotate(45deg) scale(1.1); opacity: 1; box-shadow: 0 0 20px rgba(255, 75, 130, 0.8); }
+        }
+
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800 font-sans">
-    <div class="max-w-4xl mx-auto p-6 mt-10">
-        <div class="bg-white rounded-xl shadow-lg p-8">
-            <h1 class="text-3xl font-bold mb-2 text-center text-blue-600">Object Detection (Faster R-CNN)</h1>
-            <p class="text-center text-gray-500 mb-8">이미지를 업로드하면 객체를 탐지하여 결과를 시각화합니다.</p>
-            
-            <form id="uploadForm" class="flex flex-col items-center gap-4">
-                <div class="w-full max-w-md">
-                    <label class="block mb-2 text-sm font-medium text-gray-900" for="file_input">이미지 업로드</label>
-                    <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2" id="file_input" type="file" accept="image/*" required>
-                </div>
-                
-                <div class="w-full max-w-md">
-                    <label class="block mb-2 text-sm font-medium text-gray-900" for="threshold">신뢰도 임계값 (Threshold)</label>
-                    <input type="range" id="threshold" min="0.1" max="1.0" step="0.1" value="0.5" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                    <div class="text-center mt-1 text-sm text-gray-600" id="thresholdValue">0.5</div>
+<body>
+
+    <div class="decor decor-1"></div>
+    <div class="decor decor-2"></div>
+
+    <div id="loading">
+        <div class="heart-loader"></div>
+        <p>두 사람의 우주적 인연을 분석하는 중...✨</p>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>별자리 연인 궁합 💖</h1>
+            <p class="subtitle">이름, 생년월일, 별자리로 알아보는 우리 둘의 로맨틱 매칭 지수</p>
+        </header>
+
+        <div class="glass-panel">
+            <form action="/api/compatibility" method="POST" onsubmit="showLoading()">
+                <div class="form-grid">
+                    <!-- 사람 1 -->
+                    <div class="person-card">
+                        <h2>나의 정보 👤</h2>
+                        
+                        <div class="input-group">
+                            <label>이름</label>
+                            <input type="text" name="p1_name" placeholder="홍길동" required value="{{ form_data.p1_name if form_data else '' }}">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>생년월일</label>
+                            <input type="date" name="p1_dob" required value="{{ form_data.p1_dob if form_data else '' }}">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>나이</label>
+                            <input type="number" name="p1_age" placeholder="예: 25" min="1" max="120" required value="{{ form_data.p1_age if form_data else '' }}">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>별자리</label>
+                            <select name="p1_zodiac" required>
+                                <option value="">선택해주세요</option>
+                                <option value="양자리" {% if form_data and form_data.p1_zodiac == '양자리' %}selected{% endif %}>♈ 양자리 (3.21~4.19)</option>
+                                <option value="황소자리" {% if form_data and form_data.p1_zodiac == '황소자리' %}selected{% endif %}>♉ 황소자리 (4.20~5.20)</option>
+                                <option value="쌍둥이자리" {% if form_data and form_data.p1_zodiac == '쌍둥이자리' %}selected{% endif %}>♊ 쌍둥이자리 (5.21~6.21)</option>
+                                <option value="게자리" {% if form_data and form_data.p1_zodiac == '게자리' %}selected{% endif %}>♋ 게자리 (6.22~7.22)</option>
+                                <option value="사자자리" {% if form_data and form_data.p1_zodiac == '사자자리' %}selected{% endif %}>♌ 사자자리 (7.23~8.22)</option>
+                                <option value="처녀자리" {% if form_data and form_data.p1_zodiac == '처녀자리' %}selected{% endif %}>♍ 처녀자리 (8.23~9.22)</option>
+                                <option value="천칭자리" {% if form_data and form_data.p1_zodiac == '천칭자리' %}selected{% endif %}>♎ 천칭자리 (9.23~10.22)</option>
+                                <option value="전갈자리" {% if form_data and form_data.p1_zodiac == '전갈자리' %}selected{% endif %}>♏ 전갈자리 (10.23~11.22)</option>
+                                <option value="사수자리" {% if form_data and form_data.p1_zodiac == '사수자리' %}selected{% endif %}>♐ 사수자리 (11.23~12.21)</option>
+                                <option value="염소자리" {% if form_data and form_data.p1_zodiac == '염소자리' %}selected{% endif %}>♑ 염소자리 (12.22~1.19)</option>
+                                <option value="물병자리" {% if form_data and form_data.p1_zodiac == '물병자리' %}selected{% endif %}>♒ 물병자리 (1.20~2.18)</option>
+                                <option value="물고기자리" {% if form_data and form_data.p1_zodiac == '물고기자리' %}selected{% endif %}>♓ 물고기자리 (2.19~3.20)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 사람 2 -->
+                    <div class="person-card">
+                        <h2>상대방 정보 💕</h2>
+                        
+                        <div class="input-group">
+                            <label>이름</label>
+                            <input type="text" name="p2_name" placeholder="김철수" required value="{{ form_data.p2_name if form_data else '' }}">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>생년월일</label>
+                            <input type="date" name="p2_dob" required value="{{ form_data.p2_dob if form_data else '' }}">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>나이</label>
+                            <input type="number" name="p2_age" placeholder="예: 28" min="1" max="120" required value="{{ form_data.p2_age if form_data else '' }}">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label>별자리</label>
+                            <select name="p2_zodiac" required>
+                                <option value="">선택해주세요</option>
+                                <option value="양자리" {% if form_data and form_data.p2_zodiac == '양자리' %}selected{% endif %}>♈ 양자리 (3.21~4.19)</option>
+                                <option value="황소자리" {% if form_data and form_data.p2_zodiac == '황소자리' %}selected{% endif %}>♉ 황소자리 (4.20~5.20)</option>
+                                <option value="쌍둥이자리" {% if form_data and form_data.p2_zodiac == '쌍둥이자리' %}selected{% endif %}>♊ 쌍둥이자리 (5.21~6.21)</option>
+                                <option value="게자리" {% if form_data and form_data.p2_zodiac == '게자리' %}selected{% endif %}>♋ 게자리 (6.22~7.22)</option>
+                                <option value="사자자리" {% if form_data and form_data.p2_zodiac == '사자자리' %}selected{% endif %}>♌ 사자자리 (7.23~8.22)</option>
+                                <option value="처녀자리" {% if form_data and form_data.p2_zodiac == '처녀자리' %}selected{% endif %}>♍ 처녀자리 (8.23~9.22)</option>
+                                <option value="천칭자리" {% if form_data and form_data.p2_zodiac == '천칭자리' %}selected{% endif %}>♎ 천칭자리 (9.23~10.22)</option>
+                                <option value="전갈자리" {% if form_data and form_data.p2_zodiac == '전갈자리' %}selected{% endif %}>♏ 전갈자리 (10.23~11.22)</option>
+                                <option value="사수자리" {% if form_data and form_data.p2_zodiac == '사수자리' %}selected{% endif %}>♐ 사수자리 (11.23~12.21)</option>
+                                <option value="염소자리" {% if form_data and form_data.p2_zodiac == '염소자리' %}selected{% endif %}>♑ 염소자리 (12.22~1.19)</option>
+                                <option value="물병자리" {% if form_data and form_data.p2_zodiac == '물병자리' %}selected{% endif %}>♒ 물병자리 (1.20~2.18)</option>
+                                <option value="물고기자리" {% if form_data and form_data.p2_zodiac == '물고기자리' %}selected{% endif %}>♓ 물고기자리 (2.19~3.20)</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
 
-                <button type="submit" class="mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition duration-200 shadow-md">
-                    탐지 시작
-                </button>
+                <button type="submit" class="submit-btn" id="submitBtn">궁합 확인하기 ✨</button>
             </form>
 
-            <div id="loading" class="hidden flex-col items-center mt-8">
-                <div class="loader mb-4"></div>
-                <p class="text-gray-500">모델 추론 중입니다. 잠시만 기다려주세요...</p>
+            <!-- 에러 메시지 -->
+            {% if error %}
+            <div class="error-msg">
+                <strong>오류:</strong> {{ error }}
             </div>
+            {% endif %}
 
-            <div id="resultSection" class="hidden mt-10 border-t pt-8">
-                <h2 class="text-2xl font-bold mb-4">탐지 결과: <span id="numObjects" class="text-blue-600"></span>개의 객체</h2>
+            <!-- 결과 영역 -->
+            {% if result %}
+            <div class="result-section" id="resultBlock">
+                <hr style="border: 0; height: 1px; background: rgba(255,255,255,0.1); margin: 3rem 0;">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Image -->
-                    <div class="flex justify-center bg-gray-50 rounded-lg border p-2">
-                        <img id="resultImage" class="max-w-full h-auto rounded shadow-sm" src="" alt="Result Image">
-                    </div>
-                    
-                    <!-- JSON Data -->
-                    <div class="bg-gray-800 text-green-400 p-4 rounded-lg overflow-y-auto max-h-[500px] shadow-inner text-sm font-mono format-json">
-                        <pre id="jsonResult"></pre>
+                <h2 style="justify-content: center; font-size: 2rem; margin-bottom: 2rem;">
+                    {{ p1_name }} 💘 {{ p2_name }}
+                </h2>
+                
+                <div class="score-circle">
+                    <div class="score-num">
+                        {{ result.점수 }}<span>점</span>
                     </div>
                 </div>
+                
+                <div class="explanation">
+                    {{ result.궁합_설명 | replace('\n', '<br>') | safe }}
+                </div>
+                
+                <button type="button" class="submit-btn" style="margin-top: 2rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);" onclick="window.location.href='/'">
+                    다시 하기 🔄
+                </button>
             </div>
+            {% endif %}
+            
         </div>
     </div>
 
     <script>
-        const form = document.getElementById('uploadForm');
-        const fileInput = document.getElementById('file_input');
-        const thresholdInput = document.getElementById('threshold');
-        const thresholdValue = document.getElementById('thresholdValue');
-        
-        const loading = document.getElementById('loading');
-        const resultSection = document.getElementById('resultSection');
-        const resultImage = document.getElementById('resultImage');
-        const jsonResult = document.getElementById('jsonResult');
-        const numObjectsSpan = document.getElementById('numObjects');
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
 
-        thresholdInput.addEventListener('input', (e) => {
-            thresholdValue.textContent = parseFloat(e.target.value).toFixed(1);
-        });
-
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (!fileInput.files[0]) return;
-
-            const formData = new FormData();
-            formData.append('file', fileInput.files[0]);
-            formData.append('threshold', thresholdInput.value);
-
-            // UI 업데이트
-            resultSection.classList.add('hidden');
-            loading.classList.remove('hidden');
-            loading.classList.add('flex');
-
-            try {
-                const response = await fetch('/object-detection', {
-                    method: 'POST',
-                    body: formData
-                });
-
-                if (!response.ok) {
-                    throw new Error(`API 오류: ${response.status}`);
-                }
-
-                const data = await response.json();
-                
-                // 결과 UI 업데이트
-                numObjectsSpan.textContent = data.num_objects;
-                resultImage.src = `data:image/jpeg;base64,${data.image_base64}`;
-                
-                // json 포맷팅을 위해 이미지 데이터는 제외하고 노출
-                const displayData = { ...data };
-                delete displayData.image_base64;
-                jsonResult.textContent = JSON.stringify(displayData, null, 2);
-
-                loading.classList.add('hidden');
-                loading.classList.remove('flex');
-                resultSection.classList.remove('hidden');
-                
-            } catch (error) {
-                alert(`에러가 발생했습니다: ${error.message}`);
-                loading.classList.add('hidden');
-                loading.classList.remove('flex');
-            }
-        });
+        // 결과가 있으면 스크롤을 결과 영역으로 부드럽게 이동
+        {% if result %}
+        window.onload = function() {
+            document.getElementById('resultBlock').scrollIntoView({ behavior: 'smooth' });
+        }
+        {% endif %}
     </script>
 </body>
 </html>
